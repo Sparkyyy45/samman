@@ -66,7 +66,7 @@ export function Header() {
       <header
         className={cn(
           "sticky top-0 z-50 border-b transition-colors duration-300",
-          scrolled ? "border-ink/10 bg-ivory/95 backdrop-blur-md" : "border-ink/8 bg-ivory",
+          scrolled ? "border-ink/10 bg-ivory/95 backdrop-blur-md shadow-xs" : "border-ink/8 bg-ivory",
         )}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
@@ -130,40 +130,95 @@ export function Header() {
         </div>
       </header>
 
-      {/* Mobile Drawer with smooth vertical scrolling & Escape key trap */}
+      {/* Mobile Drawer with dedicated Top Bar & Cross Button */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-ivory transition-all duration-500 lg:hidden overflow-y-auto",
+          "fixed inset-0 z-60 bg-ivory transition-all duration-300 lg:hidden flex flex-col",
           open ? "visible opacity-100" : "invisible opacity-0 pointer-events-none",
         )}
         role="dialog"
         aria-modal={open}
         aria-label="Mobile Navigation"
       >
-        <div className="flex min-h-full flex-col justify-between px-6 pb-10 pt-28">
-          <nav className="flex flex-col gap-1" aria-label="Mobile">
-            {nav.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="font-serif text-3xl sm:text-4xl font-medium text-ink py-2.5 hover:text-terracotta-dark transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
+        {/* Drawer Header Bar with Logo and prominent '✕' Close Button */}
+        <div className="flex items-center justify-between border-b border-ink/10 bg-ivory px-5 py-4 sm:px-8 shrink-0">
+          <Logo onClick={() => setOpen(false)} />
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-ink/20 text-ink hover:border-ink hover:bg-ink hover:text-cream transition-all duration-200 cursor-pointer active:scale-95"
+            aria-label="Close menu and return to page"
+            title="Close menu"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Scrollable Navigation Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col justify-between">
+          <nav className="flex flex-col gap-2" aria-label="Mobile">
+            {nav.map((item) => {
+              const active = path === item.to || (item.to === routes.shop && path.startsWith("/shop"));
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "font-serif text-3xl sm:text-4xl font-medium py-2.5 transition-colors flex items-center justify-between",
+                    active ? "text-terracotta-dark" : "text-ink hover:text-terracotta-dark",
+                  )}
+                >
+                  <span>{item.label}</span>
+                  {active && (
+                    <span className="text-[0.65rem] uppercase tracking-widest text-terracotta-dark font-sans font-medium">
+                      Current
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
             <Link
               to={routes.contact}
               onClick={() => setOpen(false)}
-              className="font-serif text-3xl sm:text-4xl font-medium text-ink py-2.5 hover:text-terracotta-dark transition-colors"
+              className={cn(
+                "font-serif text-3xl sm:text-4xl font-medium py-2.5 transition-colors flex items-center justify-between",
+                path === routes.contact ? "text-terracotta-dark" : "text-ink hover:text-terracotta-dark",
+              )}
             >
-              Contact
+              <span>Contact</span>
+              {path === routes.contact && (
+                <span className="text-[0.65rem] uppercase tracking-widest text-terracotta-dark font-sans font-medium">
+                  Current
+                </span>
+              )}
             </Link>
           </nav>
-          <div className="mt-8 pt-6 border-t border-ink/10">
+
+          <div className="mt-8 pt-6 border-t border-ink/10 flex flex-col gap-3">
             <ButtonLink to={routes.quote} onClick={() => setOpen(false)} className="w-full">
               Request a Bulk Quote
             </ButtonLink>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-center gap-1.5 text-xs tracking-wider uppercase font-medium text-muted hover:text-ink py-2 cursor-pointer transition-colors"
+            >
+              <span>✕ Return to page</span>
+            </button>
           </div>
         </div>
       </div>
